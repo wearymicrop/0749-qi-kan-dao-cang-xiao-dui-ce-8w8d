@@ -40,10 +40,10 @@
         <section class="panel register" id="balance" aria-labelledby="register-title">
           <div class="panel-heading">
             <h2 id="register-title">期位校对</h2>
-            <div class="filters"><label for="chain">订阅链</label><select id="chain"><option value="all">全部</option></select><label for="filter">状态</label><select id="filter"><option value="all">全部</option><option value="disputed">争议</option><option value="missing">缺刊</option><option value="covered">已覆盖</option></select></div>
+            <div class="filters"><label for="version">版本</label><select id="version" hidden><option value="baseline">交班签收</option></select><label for="chain">订阅链</label><select id="chain"><option value="all">全部</option></select><label for="filter">状态</label><select id="filter"><option value="all">全部</option><option value="disputed">争议</option><option value="missing">缺刊</option><option value="covered">已覆盖</option></select></div>
           </div>
           <div class="register-scroll">
-            <table aria-label="应到与到藏对照"><thead><tr><th scope="col">订阅链</th><th scope="col">应到卷期</th><th scope="col">勾稽</th><th scope="col">到藏记录</th><th scope="col">原件</th></tr></thead><tbody id="register"></tbody></table>
+            <table aria-label="应到与到藏对照"><thead><tr><th scope="col">订阅链</th><th scope="col">应到卷期</th><th scope="col">勾稽</th><th scope="col">较交班</th><th scope="col">到藏记录</th><th scope="col">原件</th></tr></thead><tbody id="register"></tbody></table>
           </div>
           <div class="sum" id="sum"></div>
         </section>
@@ -62,11 +62,41 @@
       </section>
       <section class="panel archive" id="runs" aria-labelledby="archive-title">
         <div class="panel-heading"><h2 id="archive-title">证据寄送</h2><small id="run-metadata"></small></div>
-        <div class="archive-tools"><button id="rerun" type="button" disabled>重跑归档</button><a id="export" hidden>下载勾稽凭证</a><button id="print" type="button">打印校对册</button><span role="status" id="run-feedback"></span></div>
+        <div class="archive-tools">
+          <button id="rerun" type="button" disabled>重跑归档</button>
+          <a id="export" hidden>下载勾稽凭证</a>
+          <button id="print" type="button">打印校对册</button>
+          <span role="status" id="run-feedback"></span>
+        </div>
+        <div class="handover">
+          <div class="handover-head"><strong>交班签收</strong><span id="signature-ref" class="folio">未签收</span></div>
+          <div class="handover-tools">
+            <input id="signer" type="text" placeholder="签收人" aria-label="签收人">
+            <input id="sign-note" type="text" placeholder="交班备注" aria-label="交班备注">
+            <button id="sign" type="button" disabled>签收本版</button>
+          </div>
+          <p class="hint" id="sign-hint">签收后，交班依据固定；补录不改写签收版，另生成可追溯修订版。</p>
+        </div>
+        <div class="handover">
+          <div class="handover-head"><strong>供应商补录</strong><span class="folio">迟到原件 · 签收原件勘误</span></div>
+          <textarea id="supplement-data" rows="4" spellcheck="false" placeholder='{"receipts": [{"accession": "…", "title": "…", "year": 2026, "volume": "18", "issue": "3", "kind": "regular"}], "note": "补录批注"}'></textarea>
+          <div class="handover-tools">
+            <button id="revision" type="button" disabled>登记补录并生成修订版</button>
+            <span role="status" id="revision-feedback"></span>
+          </div>
+          <p class="hint">同一补录重跑命中既有修订，不新增覆盖、不重复追加来刊行；未对平的行保留在隔离与补录归因中。</p>
+        </div>
+        <div class="hash" id="revision-summary" hidden></div>
+      </section>
+      <section class="panel revision" id="revisions" hidden aria-labelledby="revision-title">
+        <div class="panel-heading"><h2 id="revision-title">修订对照</h2><small class="folio">上一版 → 本版 · 原件来源</small></div>
+        <div id="revision-body" class="revision-body"></div>
       </section>
     </main>
     <footer><span id="status" role="status">读取清册…</span><span>规则 {{ version }} · 年度期位 · UTC</span><a href="/docs">接口文档</a></footer>
   </div>
   <script type="application/json" id="reason-labels">{{ labels|tojson }}</script>
+  <script type="application/json" id="change-labels">{{ change_labels|tojson }}</script>
+  <script type="application/json" id="supplement-kinds">{{ supplement_kinds|tojson }}</script>
 </body>
 </html>

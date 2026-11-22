@@ -1,5 +1,6 @@
 export const states = { covered: '已覆盖', missing: '缺刊', disputed: '争议' };
 const labels = JSON.parse(document.querySelector('#reason-labels').textContent);
+const changeLabels = JSON.parse(document.querySelector('#change-labels').textContent);
 
 export function element(tag, text, className) {
   const result = document.createElement(tag);
@@ -20,12 +21,34 @@ export function paintEvidence(slot) {
     return;
   }
   panel.replaceChildren(element('h3', folio(slot)), element('p', labels[slot.code] || states[slot.status]));
+  if (slot.before) {
+    const compare = element('div', undefined, 'evidence-compare');
+    for (const [label, outcome] of [['较交班', slot.before], ['当天', slot]]) {
+      const column = element('div');
+      column.append(element('span', label, 'folio'),
+        element('p', labels[outcome.code] || states[outcome.status]));
+      for (const row of outcome.evidence) {
+        column.append(element('p', `${originText(row)} · ${row.accession}`));
+      }
+      if (!outcome.evidence.length) column.append(element('p', '无来刊原件', 'hint'));
+      compare.append(column);
+    }
+    panel.append(compare, element('p', changeLabels[slot.reason] || '', 'folio'));
+  }
   for (const row of slot.evidence) {
     const record = element('article');
-    record.append(element('div', `原始行 ${row.line} · ${row.accession}`, 'accession'),
+    record.dataset.origin = row.origin || 'baseline';
+    record.append(
+      element('div', `${originText(row)} · ${row.accession}`, 'accession'),
       element('p', row.raw.title), element('p', `原录 ${row.raw.volume} 卷 ${row.raw.issue} 期`));
     panel.append(record);
   }
+}
+
+function originText(row) {
+  if (row.origin === 'supplement') return `补录第 ${row.supplement_line} 行 · 原始行 ${row.line}`;
+  if (row.origin === 'prior') return `先前补录 · 原始行 ${row.line}`;
+  return `原始行 ${row.line}`;
 }
 
 export function paintExtras(supplements, isolated, duplicates) {

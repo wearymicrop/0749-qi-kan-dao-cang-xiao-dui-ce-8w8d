@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from app.config import ROOT, RULE_VERSION, SAMPLES
+from app.modules.m7_dispatch.revision import CHANGE_LABELS, SUPPLEMENT_KINDS
 from app.reasons import LABELS
 
 pages = APIRouter(include_in_schema=False)
@@ -17,4 +18,5 @@ INDEX = {
 def index(request: Request):
     return templates.TemplateResponse(request=request, name="index.html", context={
         "sections": INDEX, "samples": SAMPLES, "labels": LABELS, "version": RULE_VERSION,
+        "change_labels": CHANGE_LABELS, "supplement_kinds": SUPPLEMENT_KINDS,
     })

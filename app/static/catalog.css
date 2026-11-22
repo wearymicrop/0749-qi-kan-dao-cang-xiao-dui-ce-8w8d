@@ -50,3 +50,36 @@ summary { cursor: pointer; color: var(--accent); padding: 5px 0; }
   .kpi strong { font-size: 21px; }
   table { min-width: 410px; }
 }
+
+/* 修订对照与交班签收 */
+tr.changed td:first-child { box-shadow: inset 2px 0 var(--accent); }
+.delta-badge { color: var(--accent); font-size: 12px; }
+.revision-summary { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px var(--pad); border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.revision-audit { display: flex; flex-wrap: wrap; gap: 4px 18px; padding: 8px var(--pad); border-bottom: 1px solid var(--line); font-size: 12px; }
+.revision-audit p { display: flex; gap: 6px; align-items: baseline; }
+.revision-audit .seal { color: var(--accent); }
+.revision-body { max-height: 520px; overflow: auto; }
+.delta-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: var(--gap); padding: var(--pad); }
+.delta-card { border: 1px solid var(--line); background: var(--panel); padding: 10px 12px; }
+.delta-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-bottom: 8px; }
+.delta-head .seal { color: var(--accent); font-size: 12px; }
+.delta-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.delta-column[data-origin="baseline"] { border-right: 1px dashed var(--line); padding-right: 10px; }
+.delta-column .folio { color: var(--muted); }
+.delta-evidence-list { margin-top: 6px; display: grid; gap: 6px; }
+.delta-evidence { display: grid; gap: 1px; font-size: 12px; }
+.delta-evidence[data-origin="supplement"] { border-left: 2px solid var(--accent); padding-left: 6px; }
+.delta-evidence .folio { color: var(--accent); }
+.evidence-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; padding: 8px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 12px; }
+.evidence-compare .folio { color: var(--muted); }
+.handover { padding: 10px var(--pad); border-top: 1px solid var(--line); display: grid; gap: 7px; }
+.handover-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.handover-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.handover input { min-width: 150px; }
+.handover textarea { width: 100%; font-family: var(--mono); }
+.handover .hint, .hint { color: var(--muted); font-size: 12px; }
+.hash { padding: 10px var(--pad); border-top: 1px solid var(--line); font-family: var(--mono); font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+@media (max-width: 720px) {
+  .delta-compare, .evidence-compare { grid-template-columns: 1fr; }
+  .delta-column[data-origin="baseline"] { border-right: 0; border-bottom: 1px dashed var(--line); padding: 0 0 8px; }
+}

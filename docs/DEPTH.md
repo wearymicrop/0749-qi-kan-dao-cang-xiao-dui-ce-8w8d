@@ -11,6 +11,7 @@
 | M5 刊名沿革 | 按出版年度追溯刊名所属订阅链 | `GET /api/titles/dirty` | `app/modules/m5_titles/service.py` | `tests/test_titles.py` |
 | M6 缺刊勾稽 | 比对期位与来刊行的分区账目 | `GET /api/balance/dirty` | `app/modules/m6_balance/service.py` | `tests/test_balance.py` |
 | M7 证据寄送 | 按输入与规则摘要封存并重跑证据 | `POST /api/runs` | `app/modules/m7_dispatch/service.py` `app/store.py` | `tests/test_dispatch.py` |
+| M8 补录修订 | 签收交班依据；迟到原件与勘误另行登记修订版 | `POST /api/runs/{id}/sign` `POST /api/runs/{id}/revisions` | `app/modules/m7_dispatch/revision.py` | `tests/test_revisions.py` |
 
 ## 陷阱登记
 
@@ -28,7 +29,13 @@
 | TRAP-10 | 改刊名后继续订阅 | 同一订阅被拆为两条链 | 按出版年度解析新旧刊名 | `app/modules/m5_titles/service.py` | `tests/test_titles.py::test_title_change_keeps_chain` |
 | TRAP-11 | 合期与单期部分重叠 | 两个期位全部进入争议 | 只标记重叠期位 | `app/modules/m6_balance/slots.py` | `tests/test_balance.py::test_overlap_only_disputes_shared_slot` |
 | TRAP-12 | 同份数据重跑 | 生成第二份档案并覆盖时间 | 使用版本与输入摘要定位首份归档 | `app/store.py` | `tests/test_dispatch.py::test_archive_and_rerun_keep_digest_and_first_result` |
+| TRAP-13 | 签收后再补录 | 重算覆盖签收版，交班依据被改写 | 签收版原样封存，补录另生成引用基线的修订版 | `app/modules/m7_dispatch/revision.py` | `tests/test_revisions.py::test_revision_keeps_signed_baseline_untouched` |
+| TRAP-14 | 同一补录重跑 | 同批迟到件重复计为覆盖 | 以补录规范摘要定位既有修订，不新增覆盖与来刊行 | `app/modules/m7_dispatch/revision.py` | `tests/test_revisions.py::test_same_supplement_rerun_reuses_revision_without_new_coverage` |
+| TRAP-15 | 补录未对平 | 丢弃隔离行导致记录消失 | 隔离行保留并逐行归因，两差额仍须为零 | `app/modules/m7_dispatch/revision.py` | `tests/test_revisions.py::test_unmatched_supplement_rows_are_retained_not_dropped` |
+| TRAP-16 | 勘误同验收号 | 后写入改写签收原件 | 与签收原件并列，期位转为争议 | `app/modules/m7_dispatch/revision.py` | `tests/test_revisions.py::test_correction_keeps_both_originals_and_disputes_slot` |
 
 ## 对账规则
 
 应到期位 = 已覆盖 + 缺刊 + 争议。来刊行 = 正刊候选 + 增刊 + 重复回传 + 隔离。两个差额均为零时返回 `MATCHED`，缺刊和争议仍需处理。
+
+修订版只在签收基线上追加来刊行，不删除签收原件，因此修订版的来刊行账目仍按同一等式对平：`input = coverage + supplements + duplicates + isolated`。补录行无论采信、冲突、重放或隔离，都出现在 `supplement_audit.rows` 中并保留原始位置。`delta` 对照上一修订版（无修订时为签收版），`baseline_delta` 始终对照签收版，二者共同回答“哪些期位改变、用了哪些原件及两版为何不同”。
